@@ -6,7 +6,7 @@ genai.configure(api_key="AIzaSyB5AmpIN3_fhAVZWei-qeRALjHmTWG1sis")
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
-# Mystery UI - ကတ်ပုံကိုပဲ မြင်ရအောင် ညှိထားပါတယ်
+# CSS ကို နာမည်ဖျောက်ဖို့နဲ့ ခလုတ်လှလှလေးဖြစ်ဖို့ ပြင်ထားပါတယ်
 st.markdown("""
     <style>
     .stImage > img {
@@ -16,20 +16,29 @@ st.markdown("""
         background-color: #1a1a1a;
         border-radius: 8px;
     }
+    /* ခလုတ်ကို ကတ်ပုံနဲ့ တစ်သားတည်းဖြစ်အောင် ညှိခြင်း */
     div.stButton > button {
         width: 100%;
+        height: 45px;
         background-color: #2e2e2e;
         color: white;
+        border: 1px solid #444;
         border-radius: 0 0 8px 8px;
+        font-weight: bold;
+    }
+    div.stButton > button:hover {
+        background-color: #4a4a4a;
+        border: 1px solid #ff4b4b;
     }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
+st.write("ကတ်ပုံပေါ်ရှိ 'ရွေးချယ်မည်' ခလုတ်ကို နှိပ်၍ ဟောကိန်းထုတ်နိုင်ပါသည်။")
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 
-# ၂၂ ကတ်လုံး စာရင်း (နာမည်တွေကို Gallery မှာ ဖျောက်ထားပါမယ်)
+# ၂၂ ကတ်လုံး စာရင်း
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
@@ -58,7 +67,7 @@ cards = {
 if 'selected_card' not in st.session_state:
     st.session_state.selected_card = None
 
-# တစ်တန်းကို ၄ ကတ်နှုန်းနဲ့ ကတ်ပုံတွေကိုပဲ ပြသခြင်း
+# Gallery ပြသခြင်း (နာမည်မပါဘဲ ခလုတ်ပဲပြပါမယ်)
 cols = st.columns(4)
 card_list = list(cards.items())
 
@@ -66,22 +75,20 @@ for i in range(len(card_list)):
     name, img_url = card_list[i]
     with cols[i % 4]:
         st.image(img_url)
-        # ခလုတ်မှာ ကတ်နာမည်မပြဘဲ "ရွေးချယ်မည်" ဟုပဲ ပြပါမည်
+        # ခလုတ်မှာ နာမည်မပြဘဲ "ရွေးချယ်မည်" လို့ပဲ ပြပါမယ်
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (ဒီနေရာမှာ Partner ပုံထဲက အမှားကို ပြင်ထားပါတယ်)
+# ဟောချက်အပိုင်း (ကတ်ရွေးပြီးမှ နာမည်ကို Gemini က ပြောပြမှာပါ)
 if st.session_state.selected_card:
     st.divider()
-    st.info(f"သင်သည် ကတ်တစ်ကတ်ကို ရွေးချယ်ပြီးပါပြီ။")
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
-            try:
-                # Model နာမည်အမှန်ကို ဤနေရာတွင် ကြေညာပါသည်
-                model = genai.GenerativeModel('gemini-1.5-flash-latest')
-                prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
-                # response စာကြောင်းကို ဤသို့ မှန်ကန်စွာ ရေးသားပါသည်
-                response = model.generate_content(prompt)
-                st.write(response.text)
-            except Exception as e:
-                st.error(f"Error တက်သွားပါတယ်: {e}")
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။ အစမှာ သင်ရွေးချယ်လိုက်တဲ့ကတ်ကတော့ {st.session_state.selected_card} ဖြစ်ပါတယ် လို့ အသိပေးပါ။"
+            response = model.generate_content(prompt)
+            st.write(response.text)
+            # ဟောပြီးရင် Reset လုပ်ချင်ရင် သုံးနိုင်ပါတယ်
+            if st.button("ကတ်အသစ် ပြန်ရွေးမည်"):
+                st.session_state.selected_card = None
+                st.rerun()
