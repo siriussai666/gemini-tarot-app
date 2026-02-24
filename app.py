@@ -1,22 +1,71 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ခင်ဗျားရဲ့ API Key (...NN70) ကို ဒီမှာထည့်ပါ
+# API Key ချိတ်ဆက်ခြင်း
 genai.configure(api_key="AIzaSyC9ovRyS2PuDaz3iwHPYga7NTTY6lzmYq0") 
 
-st.set_page_config(page_title="Gemini Tarot", page_icon="🔮")
-st.title("🔮 Gemini Tarot ကတ်ဟောဆရာ")
+st.set_page_config(page_title="Gemini Tarot Gallery", page_icon="🔮", layout="wide")
+st.title("🔮 တားရော့ကတ်ကို ရွေးချယ်ပါ")
 
-# ကတ်ရွေးချယ်ရန် List
-cards = ["The Sun", "The Fool", "The Magician", "The Hanged Man", "The Tower", "Death", "The Emperor", "Strength", "The World", "The Lovers", "The Star", "The Hermit", "The Chariot", "Wheel of Fortune", "Justice", "Temperance", "The Devil", "The Moon", "Judgement", "The High Priestess", "The Empress", "The Hierophant"]
+# ကတ်နာမည်များနှင့် ပုံ Link များ (Partner ရဲ့ ပုံ Link တွေနဲ့ အစားထိုးရန်)
+# မှတ်ချက် - ပုံတွေကို GitHub ထဲမှာတင်ထားရင် ပိုအဆင်ပြေပါတယ်
+cards = {
+    cards = {
+    "The Sun": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/the_sun.jpg",
+    "The Fool": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/the_fool.jpg",
+    "The Magician": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The%20_Magician.jpg",
+    "The Death": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/Death.jpg",
+    "Judgement": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/Judgement.jpg",
+    "The Justic": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/Justice_Tarot.jpg",
+    "Magician": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The%20_Magician.jpg",
+    "The Chariot": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Chariot.jpg",
+    "The Devil": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Devil.jpg",
+    "The Emperor": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Emperor.jpg",
+    "The Empress": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Empress.jpg",
+    "The Hermit": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Hermit.jpg",
+    "Hanged Man": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Hanged_Man.jpg",
+    "Hermit": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Hermit.jpg",
+    "Hierophant": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Hierophant.jpg",
+    "High Priestess": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_High_Priestess.jpg",
+    "The Lovers": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Lovers.jpg",
+    "The Strength": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Strength.jpg",
+    "The Tower": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_Tower.jpg",
+    "The World": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_World.jpg",
+    "The Star": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/The_star.jpg",
+    "Wheel Of Fortune": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/Wheel_of_Fortune.jpg",
+    "The Moon": "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/blob/main/the_moon.jpg",
+    # ၂၂ ကတ်လုံးအတွက် Link တွေ အသီးသီး ထည့်ပေးပါ
+}
+}
 
-selected_card = st.selectbox("တားရော့ကတ်ကို ရွေးချယ်ပါ", cards)
+# Gallery Layout (တစ်တန်းကို ၄ ကတ်နှုန်းပြပါမယ်)
+cols = st.columns(4)
+selected_card = None
 
-if st.button("ဟောကိန်းထုတ်မည်"):
-    with st.spinner('Gemini က ကတ်ကို အဖြေထုတ်ပေးနေပါတယ်...'):
+for i, (name, img_url) in enumerate(cards.items()):
+    with cols[i % 4]:
+        st.image(img_url, use_container_width=True)
+        if st.button(f"ရွေးမည်: {name}", key=name):
+            selected_card = name
+
+# ဟောကိန်းထုတ်သည့်အပိုင်း
+if selected_card:
+    st.divider()
+    st.subheader(f"선택된 ကတ်: {selected_card}")
+    with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
         model = genai.GenerativeModel('gemini-1.5-flash')
-        # Partner ရဲ့ System Instruction
-        prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {selected_card} ကတ်အကြောင်းကို မြန်မာလို အားပေးစကားလေးတွေနဲ့အတူ အချစ်ရေး၊ စီးပွားရေး ခွဲပြီး ဟောပေးပါ။"
+        prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ်ဟောပေးပါ။"
         response = model.generate_content(prompt)
-        st.success(f"{selected_card} အတွက် ဟောကိန်း")
         st.write(response.text)
+
+# Gallery ပြသခြင်း
+cols = st.columns(3) # တစ်တန်းကို ၃ ပုံပြမယ်
+for i, (name, url) in enumerate(cards.items()):
+    with cols[i % 3]:
+        st.image(url, caption=name, use_container_width=True)
+        if st.button(f"ရွေးမည်", key=f"btn_{name}"):
+            st.session_state.selected = name
+
+# ဟောကိန်းထုတ်ခြင်းအပိုင်း (Selected ဖြစ်မှပြရန်)
+if 'selected' in st.session_state:
+    # Gemini AI Logic ကို ဒီမှာ ဆက်ရေးပါ
