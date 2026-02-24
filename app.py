@@ -1,10 +1,11 @@
 import streamlit as st
 from google import genai
 from google.genai import types
+import os
 
-# API Key ချိတ်ဆက်ခြင်း
-API_KEY = "AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk"
-client = genai.Client(api_key=API_KEY)
+# API Key ကို Secrets ထဲကနေ လုံခြုံစွာ ယူသုံးခြင်း
+api_key = st.secrets["AIzaSyB9yA1o0sUPc5Ml7wP2U6stHCevsJOVeJ4"]
+client = genai.Client(api_key=api_key)
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
@@ -38,16 +39,15 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်ထုတ်ပေးသည့်အပိုင်း (SDK အသစ်စနစ်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                model_id = "gemini-2.0-flash" # အခုနောက်ဆုံး Stable ဖြစ်တဲ့ model ကို သုံးပေးထားပါတယ်
+                # SDK အသစ်၏ ခေါ်ဆိုပုံ
+                model_id = "gemini-2.0-flash" 
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 
-                # SDK အသစ်၏ ခေါ်ဆိုပုံ
                 response = client.models.generate_content(
                     model=model_id,
                     contents=prompt,
@@ -57,4 +57,4 @@ if st.session_state.selected_card:
                 )
                 st.write(response.text)
             except Exception as e:
-                st.error(f"Error: {e}. Streamlit App ကို Delete လုပ်ပြီး ပြန်တင်ပေးပါ။")
+                st.error(f"Error: {e}. Key အသစ်ကို Secrets မှာ ထည့်ထားပါသလား?")
