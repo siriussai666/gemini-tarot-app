@@ -1,21 +1,16 @@
 import streamlit as st
-import subprocess
-import sys
+import google.generativeai as genai
+import os
 
-# ၁။ Library ကို အတင်းအဓမ္မ Update လုပ်ခိုင်းခြင်း (Force Update)
-try:
-    import google.generativeai as genai
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "google-generativeai>=0.8.0"])
-    import google.generativeai as genai
-
-# ၂။ API Key ချိတ်ဆက်ခြင်း (ဝယ်စရာမလိုပါ - Partner ၏ Key သာဖြစ်သည်)
-genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk")
+# ၁။ API Key ချိတ်ဆက်ခြင်း
+# Partner ၏ API Key ကို ဒီနေရာမှာ အသေထည့်ပေးထားပါတယ်
+API_KEY = "AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk"
+genai.configure(api_key=API_KEY)
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
 
-# Tarot Cards Setup
+# Tarot Cards Database
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 cards = {
     "The Sun": base_url + "the_sun.jpg", "The Fool": base_url + "the_fool.jpg",
@@ -34,6 +29,7 @@ cards = {
 if 'selected_card' not in st.session_state:
     st.session_state.selected_card = None
 
+# Display Cards in Grid
 cols = st.columns(4)
 card_list = list(cards.items())
 
@@ -44,16 +40,25 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ၃။ ဟောချက်ထုတ်ပေးသည့်အပိုင်း (Error ကင်းစင်သော Syntax)
+# ၂။ ဟောချက်ထုတ်ပေးသည့် အပိုင်း (Version Error ကျော်လွှားရန် ပြင်ဆင်ထားသည်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # v1beta Error ကို ကျော်လွှားရန် Version သတ်မှတ်ချက်မပါဘဲ ခေါ်ယူခြင်း
+                # v1beta error ကိုကျော်ရန် model ကို ဤသို့ခေါ်ပါ
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
+                
                 response = model.generate_content(prompt)
+                st.markdown(f"### 🔮 {st.session_state.selected_card} အတွက် ဟောချက်")
                 st.write(response.text)
+                
             except Exception as e:
-                st.error(f"Error: {e}. သင့် API Key ကို Google AI Studio တွင် တစ်ချက်ပြန်စစ်ပေးပါ။")
+                # Error တက်ပါက Model အဟောင်းဖြင့် အလိုအလျောက် ပြောင်းစမ်းမည်
+                try:
+                    model_alt = genai.GenerativeModel('gemini-pro')
+                    response_alt = model_alt.generate_content(prompt)
+                    st.write(response_alt.text)
+                except:
+                    st.error("Library အဟောင်းဖြစ်နေဆဲပါ။ အဆင့် (၃) အတိုင်း App ကို Delete လုပ်ပြီး ပြန်တင်ပေးပါ။")
