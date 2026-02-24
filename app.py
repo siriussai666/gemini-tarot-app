@@ -28,7 +28,7 @@ st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေ
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 
-# ၂၂ ကတ်လုံးအတွက် Link များ (Magician အတွက် the_magic.jpg နာမည်ကို သုံးထားသည်)
+# ၂၂ ကတ်လုံးအတွက် Link များ
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
@@ -68,19 +68,21 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (Error ဖြစ်စေသောနေရာများကို ပြင်ထားသည်)
+# ဟောချက်အပိုင်း (Error ဖြစ်စေသော Syntax များကို ပြင်ထားသည်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # Model ကို တစ်ခါပဲ ကြေညာပါ
-                model = genai.GenerativeModel('gemini-1.5-flash') 
+                # Model ကို ဤသို့ အမှန်ကန်ဆုံး ကြေညာပါ
+                model = genai.GenerativeModel('gemini-pro') 
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 
                 # generate_content ကို တိုက်ရိုက်ခေါ်ပါ
                 response = model.generate_content(prompt)
                 
-                st.write(response.text)
+                if response.text:
+                    st.write(response.text)
             except Exception as e:
+                # 404 ထပ်တက်ရင် Model နာမည်ကို gemini-1.5-pro လို့ ပြောင်းသုံးကြည့်ပါ
                 st.error(f"Error တက်သွားပါတယ်: {e}")
