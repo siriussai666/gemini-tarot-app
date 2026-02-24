@@ -31,7 +31,7 @@ base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
-    "The Magician": base_url + "The_Magician.jpg",
+    ""The Magician": base_url + "The%20_Magician.jpg",
     "The Hanged Man": base_url + "The_Hanged_Man.jpg",
     "The Tower": base_url + "The_Tower.jpg",
     "The World": base_url + "The_World.jpg",
