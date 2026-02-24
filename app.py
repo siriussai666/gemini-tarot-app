@@ -6,7 +6,7 @@ genai.configure(api_key="AIzaSyC9ovRyS2PuDaz3iwHPYga7NTTY6lzmYq0")
 
 st.set_page_config(page_title="Gemini Tarot Gallery", page_icon="🔮")
 
-# CSS ကို ပိုကောင်းအောင် ညှိထားပါတယ် (Laptop မှာ ညီနေစေဖို့)
+# CSS ညှိချက် (Gallery ပုံစံ ညီနေစေရန်)
 st.markdown("""
     <style>
     .stImage > img {
@@ -20,11 +20,6 @@ st.markdown("""
         width: 100%;
         font-size: 11px !important;
         padding: 5px !important;
-        border-radius: 0 0 8px 8px;
-    }
-    /* ကတ်တစ်ခုစီကြားက အကွာအဝေးကို ညှိခြင်း */
-    div[data-testid="column"] {
-        padding: 5px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -33,11 +28,11 @@ st.title("🔮 တားရော့ကတ် ၂၂ ကတ်")
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 
-# Magician ရဲ့ Error ကို ဒီမှာ ပြင်ပေးထားပါတယ်
+# The Magician နေရာမှာ the_magic.jpg နာမည်အတိုင်း အတိအကျ ပြင်ထားပါတယ်
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
-    "The Magician": base_url + "The_Magic.jpg", # Space ကို %20 နဲ့ ပြင်ထားတယ်
+    "The Magician": base_url + "the_magic.jpg", # နာမည်အသစ်နဲ့ ချိတ်လိုက်ပါပြီ
     "The Hanged Man": base_url + "The_Hanged_Man.jpg",
     "The Tower": base_url + "The_Tower.jpg",
     "The World": base_url + "The_World.jpg",
@@ -62,7 +57,7 @@ cards = {
 if 'selected_card' not in st.session_state:
     st.session_state.selected_card = None
 
-# Laptop မှာ တစ်တန်းကို ၄ ကတ်နှုန်းက အကောင်းဆုံးပါပဲ
+# တစ်တန်းကို ၄ ကတ်နှုန်းပြသခြင်း
 cols = st.columns(4)
 card_list = list(cards.items())
 
@@ -78,9 +73,8 @@ if st.session_state.selected_card:
     st.divider()
     st.header(f"ရွေးထားသောကတ် - {st.session_state.selected_card}")
     if st.button("ဟောကိန်းထုတ်မည် ✨"):
-        with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
+        with st.spinner('Gemini က ဟောကိန်းထုတ်ပေးနေပါတယ်...'):
             model = genai.GenerativeModel('gemini-1.5-flash')
-            # System Instruction အနည်းငယ်ထည့်ထားပါတယ်
             prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
             response = model.generate_content(prompt)
             st.write(response.text)
