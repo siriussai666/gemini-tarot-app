@@ -1,21 +1,14 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Partner ပေးထားတဲ့ API Key ကို ဒီမှာ ထည့်လိုက်ပါ
+# API Key ကို ဤနေရာတွင် အတိအကျ ထည့်ပါ
 genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk") 
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
-# Mystery Gallery CSS
-st.markdown("""
-    <style>
-    .stImage > img { height: 280px !important; object-fit: contain !important; background-color: #1a1a1a; border-radius: 8px; }
-    div.stButton > button { width: 100%; background-color: #2e2e2e; color: white; }
-    </style>
-    """, unsafe_allow_html=True)
-
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
 
+# ကတ်များ စာရင်း
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 cards = {
     "The Sun": base_url + "the_sun.jpg", "The Fool": base_url + "the_fool.jpg",
@@ -44,23 +37,29 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (Error အားလုံးကို အပြီးသတ် ရှင်းပေးထားသည်)
+# ဟောချက်ထုတ်ပေးသည့်အပိုင်း (Error-Free Version)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # ၁။ Model ကို ဤသို့ အမှန်ကန်ဆုံး ကြေညာပါ
+                # ၁။ Model ကို ကြေညာပါ
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 
-                # ၂။ Prompt တည်ဆောက်ပါ
+                # ၂။ Prompt ရေးပါ
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 
-                # ၃။ generate_content ကို တိုက်ရိုက်ခေါ်ပါ
-                # Partner ရဲ့ ပုံထဲက response = model.genai.GenerativeModel... ဆိုတာကြီး လုံးဝမရေးရပါ
+                # ၃။ generate_content ကို သုံးပါ (model.genai... ဟု လုံးဝ မရေးရပါ)
                 response = model.generate_content(prompt)
                 
                 # ၄။ ရလဒ်ပြပါ
                 st.write(response.text)
+                
             except Exception as e:
-                st.error(f"Error တက်သွားပါတယ်: {e}")
+                # အကယ်၍ 1.5 flash နဲ့ 404 ထပ်တက်ရင် Model အဟောင်းနဲ့ စမ်းကြည့်ပါမယ်
+                try:
+                    model_alt = genai.GenerativeModel('gemini-pro')
+                    response_alt = model_alt.generate_content(prompt)
+                    st.write(response_alt.text)
+                except:
+                    st.error(f"Error: {e}")
