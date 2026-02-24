@@ -1,15 +1,16 @@
 import streamlit as st
 import google.generativeai as genai
 
-# API Key ကို သေချာထည့်ပါ (Studio က ရတဲ့ key ကို ဒီမှာ အစားထိုးပါ)
+# ခင်ဗျားရဲ့ API Key (...NN70)
 genai.configure(api_key="AIzaSyB5AmpIN3_fhAVZWei-qeRALjHmTWG1sis") 
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
-# Mystery Gallery အတွက် CSS (နာမည်ဖျောက်ထားရန်)
+# Mystery UI - ကတ်ပုံကိုပဲ မြင်ရအောင် ညှိထားပါတယ်
 st.markdown("""
     <style>
     .stImage > img {
+        width: 100% !important;
         height: 280px !important;
         object-fit: contain !important;
         background-color: #1a1a1a;
@@ -28,7 +29,7 @@ st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေ
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 
-# ၂၂ ကတ်လုံးအတွက် Link များ
+# ၂၂ ကတ်လုံး စာရင်း (နာမည်တွေကို Gallery မှာ ဖျောက်ထားပါမယ်)
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
@@ -57,7 +58,7 @@ cards = {
 if 'selected_card' not in st.session_state:
     st.session_state.selected_card = None
 
-# Gallery ပြသခြင်း
+# တစ်တန်းကို ၄ ကတ်နှုန်းနဲ့ ကတ်ပုံတွေကိုပဲ ပြသခြင်း
 cols = st.columns(4)
 card_list = list(cards.items())
 
@@ -65,24 +66,22 @@ for i in range(len(card_list)):
     name, img_url = card_list[i]
     with cols[i % 4]:
         st.image(img_url)
+        # ခလုတ်မှာ ကတ်နာမည်မပြဘဲ "ရွေးချယ်မည်" ဟုပဲ ပြပါမည်
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (Error ဖြစ်စေသော Syntax များကို ပြင်ထားသည်)
+# ဟောချက်အပိုင်း (ဒီနေရာမှာ Partner ပုံထဲက အမှားကို ပြင်ထားပါတယ်)
 if st.session_state.selected_card:
     st.divider()
+    st.info(f"သင်သည် ကတ်တစ်ကတ်ကို ရွေးချယ်ပြီးပါပြီ။")
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # Model ကို ဤသို့ အမှန်ကန်ဆုံး ကြေညာပါ
-                model = genai.GenerativeModel('gemini-pro') 
+                # Model နာမည်အမှန်ကို ဤနေရာတွင် ကြေညာပါသည်
+                model = genai.GenerativeModel('gemini-1.5-flash-latest')
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
-                
-                # generate_content ကို တိုက်ရိုက်ခေါ်ပါ
+                # response စာကြောင်းကို ဤသို့ မှန်ကန်စွာ ရေးသားပါသည်
                 response = model.generate_content(prompt)
-                
-                if response.text:
-                    st.write(response.text)
+                st.write(response.text)
             except Exception as e:
-                # 404 ထပ်တက်ရင် Model နာမည်ကို gemini-1.5-pro လို့ ပြောင်းသုံးကြည့်ပါ
                 st.error(f"Error တက်သွားပါတယ်: {e}")
