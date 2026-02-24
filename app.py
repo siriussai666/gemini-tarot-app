@@ -1,7 +1,15 @@
 import streamlit as st
-import google.generativeai as genai
+import subprocess
+import sys
 
-# Partner ရဲ့ API Key (ဝယ်စရာမလိုပါ)
+# ၁။ Library ကို အတင်းအဓမ္မ Update လုပ်ခိုင်းခြင်း (Force Update)
+try:
+    import google.generativeai as genai
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "google-generativeai>=0.8.0"])
+    import google.generativeai as genai
+
+# ၂။ API Key ချိတ်ဆက်ခြင်း (ဝယ်စရာမလိုပါ - Partner ၏ Key သာဖြစ်သည်)
 genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk")
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
@@ -36,16 +44,16 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
+# ၃။ ဟောချက်ထုတ်ပေးသည့်အပိုင်း (Error ကင်းစင်သော Syntax)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
-            prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
             try:
-                # Syntax အမှန်ကို သုံးထားပါသည်
+                # v1beta Error ကို ကျော်လွှားရန် Version သတ်မှတ်ချက်မပါဘဲ ခေါ်ယူခြင်း
                 model = genai.GenerativeModel('gemini-1.5-flash')
+                prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 response = model.generate_content(prompt)
                 st.write(response.text)
             except Exception as e:
-                # Library Update မအောင်မြင်သေးကြောင်း ပြသရန်
-                st.error(f"Library Update မဖြစ်သေးပါ။ App ကို Delete လုပ်ပြီး ပြန်တင်ပေးပါ။ Error: {e}")
+                st.error(f"Error: {e}. သင့် API Key ကို Google AI Studio တွင် တစ်ချက်ပြန်စစ်ပေးပါ။")
