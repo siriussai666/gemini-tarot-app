@@ -4,7 +4,7 @@ from google.genai import types
 import os
 
 # API Key ကို Secrets ထဲကနေ လုံခြုံစွာ ယူသုံးခြင်း
-api_key = st.secrets["AIzaSyB9yA1o0sUPc5Ml7wP2U6stHCevsJOVeJ4"]
+api_key = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=api_key)
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
