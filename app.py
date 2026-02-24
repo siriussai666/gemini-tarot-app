@@ -6,7 +6,7 @@ genai.configure(api_key="AIzaSyC9ovRyS2PuDaz3iwHPYga7NTTY6lzmYq0")
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
-# Mystery Gallery CSS
+# Mystery Gallery CSS (ကတ်နာမည်ဖျောက်ရန်)
 st.markdown("""
     <style>
     .stImage > img { height: 280px !important; object-fit: contain !important; background-color: #1a1a1a; border-radius: 8px; }
@@ -17,8 +17,6 @@ st.markdown("""
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
-
-# ကတ်စာရင်း
 cards = {
     "The Sun": base_url + "the_sun.jpg", "The Fool": base_url + "the_fool.jpg",
     "The Magician": base_url + "the_magic.jpg", "The Hanged Man": base_url + "The_Hanged_Man.jpg",
@@ -46,25 +44,18 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (v1beta Error ကို ကျော်ဖြတ်ရန် ပြင်ဆင်ချက်)
+# ဟောချက်အပိုင်း (Syntax Error အကုန်ရှင်းထားသည်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # 404 ကို ကျော်ဖို့ model နာမည်ကို အခြေခံကစပြီး စမ်းပါမယ်
+                # model.genai... ဟု မရေးရပါ၊ ဤသို့တိုက်ရိုက်ရေးပါ
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 
-                # Syntax Fix
+                # generate_content ကို တိုက်ရိုက်ခေါ်ပါ
                 response = model.generate_content(prompt)
                 st.write(response.text)
             except Exception as e:
-                # v1beta error ကြောင့် model ရှာမတွေ့ရင် ဒီနေရာကနေ ဟောပေးပါမယ်
-                st.warning("Model Update ဖြစ်နေလို့ ခေတ္တစောင့်ပါ။ အခြား Model နဲ့ ကြိုးစားကြည့်ပါမယ်...")
-                try:
-                    model_alt = genai.GenerativeModel('gemini-pro')
-                    response = model_alt.generate_content(prompt)
-                    st.write(response.text)
-                except:
-                    st.error(f"Error: {e}. ကျေးဇူးပြု၍ requirements.txt ထဲတွင် google-generativeai ကို update လုပ်ပေးပါ။")
+                st.error(f"Error: {e}")
