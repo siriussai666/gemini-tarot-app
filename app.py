@@ -1,12 +1,12 @@
 import streamlit as st
 import google.generativeai as genai
 
-# API Key ကို ဤနေရာတွင် အစားထိုးပါ
+# API Key ကို သေချာထည့်ပါ (Studio က ရတဲ့ key ကို ဒီမှာ အစားထိုးပါ)
 genai.configure(api_key="AIzaSyB5AmpIN3_fhAVZWei-qeRALjHmTWG1sis") 
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
-# CSS - နာမည်ဖျောက်ထားပြီး Mystery ဆန်ဆန် ပြုလုပ်ခြင်း
+# Mystery Gallery အတွက် CSS (နာမည်ဖျောက်ထားရန်)
 st.markdown("""
     <style>
     .stImage > img {
@@ -19,6 +19,7 @@ st.markdown("""
         width: 100%;
         background-color: #2e2e2e;
         color: white;
+        border-radius: 0 0 8px 8px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -27,7 +28,7 @@ st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေ
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 
-# ကတ်စာရင်း (The Magician အတွက် the_magic.jpg နာမည်ကို သုံးထားသည်)
+# ၂၂ ကတ်လုံးအတွက် Link များ (Magician အတွက် the_magic.jpg နာမည်ကို သုံးထားသည်)
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
@@ -56,7 +57,7 @@ cards = {
 if 'selected_card' not in st.session_state:
     st.session_state.selected_card = None
 
-# Gallery ပြသခြင်း (ကတ်နာမည်များ ဖျောက်ထားပါသည်)
+# Gallery ပြသခြင်း
 cols = st.columns(4)
 card_list = list(cards.items())
 
@@ -67,17 +68,19 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (ကုဒ်အမှားကို ပြင်ဆင်ထားပါသည်)
+# ဟောချက်အပိုင်း (Error ဖြစ်စေသောနေရာများကို ပြင်ထားသည်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # model ကို ဤသို့ အမှန်တကယ် ခေါ်ယူပါ
-                model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                # Model ကို တစ်ခါပဲ ကြေညာပါ
+                model = genai.GenerativeModel('gemini-1.5-flash') 
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
-                # response ကို ဤသို့ မှန်ကန်စွာ ရေးသားပါ
+                
+                # generate_content ကို တိုက်ရိုက်ခေါ်ပါ
                 response = model.generate_content(prompt)
+                
                 st.write(response.text)
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error(f"Error တက်သွားပါတယ်: {e}")
