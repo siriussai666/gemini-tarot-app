@@ -4,34 +4,30 @@ import google.generativeai as genai
 # ခင်ဗျားရဲ့ API Key (...NN70)
 genai.configure(api_key="AIzaSyC9ovRyS2PuDaz3iwHPYga7NTTY6lzmYq0") 
 
-# Layout ကို Wide မသုံးဘဲ ပုံမှန်ပဲ ထားကြည့်ပါမယ် (Laptop မှာ ပိုကြည့်ကောင်းဖို့)
 st.set_page_config(page_title="Gemini Tarot Gallery", page_icon="🔮")
 
-# CSS ကို ပိုပြီး တိတိကျကျ ပြင်လိုက်ပါတယ်
+# CSS ညှိချက် (Laptop မှာ ညီနေစေရန်)
 st.markdown("""
     <style>
-    /* ပုံရဲ့ Size ကို Fix လုပ်ပြီး Frame ညီအောင် ညှိခြင်း */
     .stImage > img {
         width: 100% !important;
-        height: 280px !important; /* အရွယ်အစားကို Laptop နဲ့ ကိုက်အောင် နည်းနည်း လျှော့ထားပါတယ် */
-        object-fit: contain !important; /* ပုံမပြတ်သွားအောင် contain သုံးထားပါတယ် */
+        height: 250px !important;
+        object-fit: contain !important;
         background-color: #1a1a1a;
-        border-radius: 8px;
+        border-radius: 5px;
     }
-    /* ခလုတ်ကို ပုံနဲ့ ကပ်နေအောင် ညှိခြင်း */
     .stButton button {
         width: 100%;
-        font-size: 12px !important;
-        padding: 0px !important;
+        font-size: 11px !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🔮 တားရော့ကတ်ကို ရွေးချယ်ပါ")
+st.title("🔮 တားရော့ကတ် ၂၂ ကတ်")
 
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 
-# ကတ်စာရင်း (Link တွေကို စစ်ဆေးပြီးသားပါ)
+# ၂၂ ကတ်လုံးကို ဒီမှာ အကုန်ထည့်ပေးထားပါတယ်
 cards = {
     "The Sun": base_url + "the_sun.jpg",
     "The Fool": base_url + "the_fool.jpg",
@@ -41,21 +37,34 @@ cards = {
     "The World": base_url + "The_World.jpg",
     "The Emperor": base_url + "The_Emperor.jpg",
     "Death": base_url + "Death.jpg",
-    "The Devil": base_url + "The_Devil.jpg"
+    "The Devil": base_url + "The_Devil.jpg",
+    "Judgement": base_url + "Judgement.jpg",
+    "The Justice": base_url + "Justice_Tarot.jpg",
+    "The Chariot": base_url + "The_Chariot.jpg",
+    "The Empress": base_url + "The_Empress.jpg",
+    "The Hermit": base_url + "The_Hermit.jpg",
+    "The Hierophant": base_url + "The_Hierophant.jpg",
+    "High Priestess": base_url + "The_High_Priestess.jpg",
+    "The Lovers": base_url + "The_Lovers.jpg",
+    "The Strength": base_url + "The_Strength.jpg",
+    "The Star": base_url + "The_star.jpg",
+    "Wheel Of Fortune": base_url + "Wheel_of_Fortune.jpg",
+    "The Moon": base_url + "the_moon.jpg",
+    "Temperance": base_url + "Temperance.jpg"
 }
 
 if 'selected_card' not in st.session_state:
     st.session_state.selected_card = None
 
-# Laptop Screen မှာ တစ်တန်းကို ၃ ကတ်နှုန်းက အရှင်းဆုံးပါပဲ
-cols = st.columns(3)
+# Laptop Screen မှာ တစ်တန်းကို ၄ ကတ်နှုန်းက အချိုးအကျဆုံးပါပဲ
+cols = st.columns(4)
 card_list = list(cards.items())
 
 for i in range(len(card_list)):
     name, img_url = card_list[i]
-    with cols[i % 3]:
+    with cols[i % 4]:
         st.image(img_url)
-        if st.button(f"ရွေးမည်: {name}", key=f"btn_{name}"):
+        if st.button(f"ရွေးမည်: {name}", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
 # ဟောချက်အပိုင်း
