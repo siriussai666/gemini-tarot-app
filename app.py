@@ -1,13 +1,13 @@
 import streamlit as st
 import google.generativeai as genai
 
-# API Key - Free Version ဖြစ်လို့ ဝယ်စရာမလိုပါ
-genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk")
+# Partner ၏ API Key (Free Version ဖြစ်၍ ဝယ်စရာမလိုပါ)
+genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk") 
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
 
-# ကတ်များစာရင်း
+# Tarot Cards Setup
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 cards = {
     "The Sun": base_url + "the_sun.jpg", "The Fool": base_url + "the_fool.jpg",
@@ -36,24 +36,23 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (Error များကို အဆင့်ဆင့်ကျော်ဖြတ်ရန်)
+# ဟောချက်အပိုင်း (Model နှစ်မျိုးလုံးကို စမ်းသပ်ပေးပါမည်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
             
-            # Model အသစ်ဖြင့် အရင်စမ်းမည်
             try:
+                # ပထမဦးစွာ 1.5 Flash ဖြင့်စမ်းပါ
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 response = model.generate_content(prompt)
                 st.write(response.text)
             except:
-                # မရပါက Model အဟောင်းဖြင့် ထပ်စမ်းမည်
                 try:
+                    # မရပါက Gemini Pro ဖြင့် ထပ်စမ်းပါ
                     model_alt = genai.GenerativeModel('gemini-pro')
                     response_alt = model_alt.generate_content(prompt)
                     st.write(response_alt.text)
                 except Exception as e:
-                    # နှစ်ခုလုံးမရပါက Library version ကြောင့်ဖြစ်သည်
-                    st.error("Library အဟောင်းဖြစ်နေသေးသည်။ App ကို Reboot ထပ်လုပ်ပေးပါ။")
+                    st.error(f"Error: {e}. Streamlit တွင် Reboot လုပ်ပေးပါ။")
