@@ -44,7 +44,7 @@ if st.session_state.selected_card:
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                model_id = "gemini-2.0-flash" # အခုနောက်ဆုံး Stable ဖြစ်တဲ့ model ကို သုံးပေးထားပါတယ်
+                model_id = "gemini-1.5-flash" # အခုနောက်ဆုံး Stable ဖြစ်တဲ့ model ကို သုံးပေးထားပါတယ်
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 
                 # SDK အသစ်၏ ခေါ်ဆိုပုံ
