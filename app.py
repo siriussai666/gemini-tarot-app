@@ -1,12 +1,12 @@
 import streamlit as st
 import google.generativeai as genai
 
-# API Key ကို ဤနေရာတွင် အတိအကျ ထည့်ပါ
+# Partner ပေးထားတဲ့ API Key ကို ဒီမှာ ထည့်လိုက်ပါ
 genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk") 
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
-# Mystery Gallery CSS (ကတ်နာမည်ဖျောက်ရန်)
+# Mystery Gallery CSS
 st.markdown("""
     <style>
     .stImage > img { height: 280px !important; object-fit: contain !important; background-color: #1a1a1a; border-radius: 8px; }
@@ -44,18 +44,23 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်အပိုင်း (Syntax Error အကုန်ရှင်းထားသည်)
+# ဟောချက်အပိုင်း (Error အားလုံးကို အပြီးသတ် ရှင်းပေးထားသည်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
             try:
-                # model.genai... ဟု မရေးရပါ၊ ဤသို့တိုက်ရိုက်ရေးပါ
+                # ၁။ Model ကို ဤသို့ အမှန်ကန်ဆုံး ကြေညာပါ
                 model = genai.GenerativeModel('gemini-1.5-flash')
+                
+                # ၂။ Prompt တည်ဆောက်ပါ
                 prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 
-                # generate_content ကို တိုက်ရိုက်ခေါ်ပါ
+                # ၃။ generate_content ကို တိုက်ရိုက်ခေါ်ပါ
+                # Partner ရဲ့ ပုံထဲက response = model.genai.GenerativeModel... ဆိုတာကြီး လုံးဝမရေးရပါ
                 response = model.generate_content(prompt)
+                
+                # ၄။ ရလဒ်ပြပါ
                 st.write(response.text)
             except Exception as e:
-                st.error(f"Error: {e}. requirements.txt ထဲတွင် Library Version ကို စစ်ဆေးပါ။")
+                st.error(f"Error တက်သွားပါတယ်: {e}")
