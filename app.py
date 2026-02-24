@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # API Key ကို သေချာထည့်ပါ
-genai.configure(api_key="AIzaSyC9ovRyS2PuDaz3iwHPYga7NTTY6lzmYq0") 
+genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk") 
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 
