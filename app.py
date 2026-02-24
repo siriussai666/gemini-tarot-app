@@ -1,13 +1,13 @@
 import streamlit as st
 import google.generativeai as genai
 
-# API Key ချိတ်ဆက်ခြင်း (Partner ရဲ့ Key)
-genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk") 
+# API Key - Free Version ဖြစ်လို့ ဝယ်စရာမလိုပါ
+genai.configure(api_key="AIzaSyDFxLfUZCTxEFzMUCAd7tzjGVyrb7ilMgk")
 
 st.set_page_config(page_title="Gemini Tarot Mystery", page_icon="🔮")
 st.title("🔮 သင်၏ ကံကြမ္မာကတ်ကို ရွေးချယ်ပါ")
 
-# Tarot Cards Setup
+# ကတ်များစာရင်း
 base_url = "https://raw.githubusercontent.com/siriussai666/gemini-tarot-app/main/"
 cards = {
     "The Sun": base_url + "the_sun.jpg", "The Fool": base_url + "the_fool.jpg",
@@ -36,22 +36,24 @@ for i in range(len(card_list)):
         if st.button(f"ရွေးချယ်မည်", key=f"btn_{i}"):
             st.session_state.selected_card = name
 
-# ဟောချက်ထုတ်ပေးသည့်အပိုင်း (404 Error ကာကွယ်ရန်)
+# ဟောချက်အပိုင်း (Error များကို အဆင့်ဆင့်ကျော်ဖြတ်ရန်)
 if st.session_state.selected_card:
     st.divider()
     if st.button("ဟောကိန်းထုတ်ရန် နှိပ်ပါ ✨"):
         with st.spinner('Gemini က ကတ်ကို ဖတ်နေပါတယ်...'):
+            prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
+            
+            # Model အသစ်ဖြင့် အရင်စမ်းမည်
             try:
-                # Syntax အမှန်ကို သုံးထားသည်
                 model = genai.GenerativeModel('gemini-1.5-flash')
-                prompt = f"မင်းက တားရော့ဟောဆရာ Gemini ဖြစ်တယ်။ {st.session_state.selected_card} ကတ်အကြောင်းကို မြန်မာလို အသေးစိတ် ဟောပေးပါ။"
                 response = model.generate_content(prompt)
                 st.write(response.text)
-            except Exception as e:
-                # Library Update မဖြစ်သေးပါက Model အဟောင်းဖြင့် စမ်းကြည့်ခြင်း
+            except:
+                # မရပါက Model အဟောင်းဖြင့် ထပ်စမ်းမည်
                 try:
                     model_alt = genai.GenerativeModel('gemini-pro')
                     response_alt = model_alt.generate_content(prompt)
                     st.write(response_alt.text)
-                except:
-                    st.error(f"Error: {e}. Streamlit App ကို Reboot လုပ်ပေးပါ။")
+                except Exception as e:
+                    # နှစ်ခုလုံးမရပါက Library version ကြောင့်ဖြစ်သည်
+                    st.error("Library အဟောင်းဖြစ်နေသေးသည်။ App ကို Reboot ထပ်လုပ်ပေးပါ။")
